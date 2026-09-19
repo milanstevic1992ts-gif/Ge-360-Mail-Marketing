@@ -71,3 +71,16 @@ class ExternalIdentity(Base):
         UniqueConstraint("engine", "external_id", name="uq_external_identity_engine_id"),
         UniqueConstraint("contact_id", "engine", name="uq_contact_engine"),
     )
+
+
+class AuditEvent(Base):
+    __tablename__ = "audit_events"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    entity_type: Mapped[str] = mapped_column(String(64), index=True)
+    entity_id: Mapped[str] = mapped_column(String(64), index=True)
+    action: Mapped[str] = mapped_column(String(120), index=True)
+    actor: Mapped[str] = mapped_column(String(120), default="ge360-core")
+    source_engine: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    detail: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
