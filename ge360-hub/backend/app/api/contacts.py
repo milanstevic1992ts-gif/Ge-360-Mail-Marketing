@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session, selectinload
 from app.db import get_db
 from app.models import Contact
 from app.schemas import ContactCreate, ContactRead
+from app.services.audit import record_event
+from app.services.dedupe import find_duplicate_candidates
 
 router = APIRouter(prefix="/contacts", tags=["contacts"])
 
@@ -13,9 +15,23 @@ router = APIRouter(prefix="/contacts", tags=["contacts"])
 def create_contact(payload: ContactCreate, db: Session = Depends(get_db)) -> Contact:
     contact = Contact(**payload.model_dump())
     db.add(contact)
+    db.flush()
+
+    record_event(
+        db,
+        entity_type="contact",
+        entity_id=contact.ge360_id,
+        action="contact.created",
+        detail=f"source={contact.source or 'manual'}",
+    )
     db.commit()
-    db.refresh(contact)
-    return contact
+
+    stmt = (
+        select(Contact)
+        .options(selectinload(Contact.external_identities))
+        .where(Contact.id == contact.id)
+    )
+    return db.scalar(stmt)
 
 
 @router.get("", response_model=list[ContactRead])
@@ -40,6 +56,25 @@ def list_contacts(
         stmt = stmt.where(Contact.city == city)
 
     return list(db.scalars(stmt).all())
+
+
+@router.get("/dedupe/candidates", response_model=list[ContactRead])
+def duplicate_candidates(
+    email: str | None = None,
+    phone: str | None = None,
+    company: str | None = None,
+    city: str | None = None,
+    limit: int = Query(default=20, ge=1, le=100),
+    db: Session = Depends(get_db),
+) -> list[Contact]:
+    return find_duplicate_candidates(
+        db,
+        email=email,
+        phone=phone,
+        company=company,
+        city=city,
+        limit=limit,
+    )
 
 
 @router.get("/{ge360_id}", response_model=ContactRead)
