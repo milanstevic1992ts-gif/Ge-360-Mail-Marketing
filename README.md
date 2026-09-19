@@ -6,16 +6,58 @@ Core/orchestratore self-hosted per lead, CRM, campagne, inbox e opportunità com
 
 GE360 resta il punto centrale. Prospex, Twenty, Mautic e OpenCRM sono motori esterni integrati tramite adapter/API: non comunicano direttamente tra loro e non diventano la fonte unica dei dati.
 
+## Avvio sviluppo
+
+Requisiti: Docker + Docker Compose plugin.
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
+
+Oppure:
+
+```bash
+make dev
+```
+
+Controlli:
+
+```bash
+docker compose ps
+bash scripts/doctor.sh
+```
+
+Core API: `http://127.0.0.1:8789`  
+Swagger: `http://127.0.0.1:8789/docs`
+
+## API v0.1
+
+- `GET /api/health` - salute core/database e configurazione motori
+- `GET /api/engines` - registry dei motori e capability
+- `POST /api/contacts` - crea contatto GE360
+- `GET /api/contacts` - lista/filtra contatti
+- `GET /api/contacts/{ge360_id}` - dettaglio contatto
+- `GET /api/contacts/dedupe/candidates` - possibili duplicati, senza merge automatico
+
+## Sicurezza configurazione
+
+Non committare mai il file `.env`. Le chiavi API restano solo nell'ambiente locale/server.
+
 ## Roadmap
 
 ### v0.1 - Core
 - [x] Repository madre
-- [ ] FastAPI orchestrator
-- [ ] Modello dati GE360 comune
-- [ ] Adapter standardizzati
-- [ ] Docker Compose di sviluppo
-- [ ] Health check / doctor
-- [ ] Configurazione .env
+- [x] FastAPI orchestrator
+- [x] Modello dati GE360 comune
+- [x] Adapter standardizzati
+- [x] Docker Compose di sviluppo
+- [x] Health check / doctor
+- [x] Configurazione .env
+- [x] Deduplica candidati
+- [x] Audit base
+- [x] Test automatici
+- [ ] CI verde
 
 ### v0.2 - Twenty + Prospex
 - [ ] Twenty come CRM operativo
@@ -52,6 +94,4 @@ OpenCRM ─┘
 
 Ogni record possiede un `ge360_id` stabile e può avere uno o più `external_ids`.
 
-## Stato
-
-Bootstrap v0.1 in corso.
+Consulta anche `docs/ARCHITECTURE.md` e `docs/ROADMAP.md`.
