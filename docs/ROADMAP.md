@@ -21,8 +21,10 @@ Criteri di uscita:
 
 ## v0.2 - Twenty + Prospex
 
+Stato: **IN CORSO**
+
 Criteri di uscita:
-- [ ] verificare API/versioni upstream
+- [x] verificare API/versioni upstream (Twenty verificato; Prospex auth documentata come blocco da risolvere sull'istanza)
 - [ ] adapter Twenty reale
 - [ ] adapter Prospex reale
 - [ ] import lead Prospex -> GE360
