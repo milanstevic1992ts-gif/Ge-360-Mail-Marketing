@@ -2,10 +2,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app import models  # noqa: F401
 from app.api.contacts import router as contacts_router
+from app.api.engines import router as engines_router
 from app.api.health import router as health_router
 from app.db import Base, engine
-from app import models  # noqa: F401
 
 
 @asynccontextmanager
@@ -23,6 +24,7 @@ app = FastAPI(
 )
 
 app.include_router(health_router, prefix="/api")
+app.include_router(engines_router, prefix="/api")
 app.include_router(contacts_router, prefix="/api")
 
 
