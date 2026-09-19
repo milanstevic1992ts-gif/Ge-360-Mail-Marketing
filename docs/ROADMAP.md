@@ -2,7 +2,7 @@
 
 ## v0.1 - Core orchestratore
 
-Stato: **IN CORSO**
+Stato: **COMPLETATA**
 
 Criteri di uscita:
 - [x] repository inizializzata
@@ -14,10 +14,10 @@ Criteri di uscita:
 - [x] endpoint health
 - [x] endpoint base contatti
 - [x] script doctor
-- [ ] deduplica contatti
-- [ ] audit event
-- [ ] test automatici
-- [ ] CI verde
+- [x] deduplica contatti
+- [x] audit event
+- [x] test automatici
+- [x] CI verde
 
 ## v0.2 - Twenty + Prospex
 
