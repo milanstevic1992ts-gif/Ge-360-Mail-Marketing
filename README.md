@@ -57,7 +57,7 @@ Non committare mai il file `.env`. Le chiavi API restano solo nell'ambiente loca
 - [x] Deduplica candidati
 - [x] Audit base
 - [x] Test automatici
-- [ ] CI verde
+- [x] CI verde
 
 ### v0.2 - Twenty + Prospex
 - [ ] Twenty come CRM operativo
