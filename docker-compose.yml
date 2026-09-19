@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ge360_marketing
+      POSTGRES_USER: ge360
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+    volumes:
+      - ge360_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ge360 -d ge360_marketing"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ge360_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  core:
+    build:
+      context: ./ge360-hub/backend
+    env_file:
+      - .env
+    environment:
+      GE360_DATABASE_URL: postgresql+psycopg://ge360:${POSTGRES_PASSWORD:-change_me}@postgres:5432/ge360_marketing
+      GE360_REDIS_URL: redis://redis:6379/0
+    ports:
+      - "${GE360_API_PORT:-8789}:8789"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8789/api/health', timeout=3)"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  ge360_postgres:
+  ge360_redis:
