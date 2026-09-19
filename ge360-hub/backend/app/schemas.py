@@ -34,6 +34,6 @@ class ContactRead(ContactCreate):
     ge360_id: str
     created_at: datetime
     updated_at: datetime
-    external_identities: list[ExternalIdentityRead] = []
+    external_identities: list[ExternalIdentityRead] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
